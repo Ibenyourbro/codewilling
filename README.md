@@ -23,8 +23,8 @@ This Project was made for my CodeWilling application. <br>
 In your terminal run
 
 ```
-git clone url....
-cd url
+git clone https://github.com/Ibenyourbro/codewilling.git
+cd codewilling
 npm install
 npm run server
 ```
