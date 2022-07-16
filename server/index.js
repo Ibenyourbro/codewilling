@@ -13,8 +13,9 @@ app.post('/offer', body('offer').isNumeric(), checkOffer, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
+  } else {
+    res.status(200).send(req.body);
   }
-  res.send(req.body);
 });
 
 app.listen(port, () => {

@@ -6,6 +6,7 @@ function App() {
     <div>
       <Header />
       <Offer />
+      <p className='text-center text-sm text-gray-600 italic'>All for fun!</p>
     </div>
   );
 }
