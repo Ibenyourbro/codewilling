@@ -12,7 +12,14 @@ export const apiSlice = createApi({
         body: { offer },
       }),
     }),
+    //creates function to send get request to /offer
+    getOffers: builder.query({
+      query: () => ({
+        url: '/offer',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useSendOfferMutation } = apiSlice;
+export const { useSendOfferMutation, useGetOffersQuery } = apiSlice;

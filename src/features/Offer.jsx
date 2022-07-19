@@ -1,14 +1,45 @@
 import React, { useState } from 'react';
 import Iben from '../images/Iben.jpg';
 import CodeWilling from '../images/CodeWilling.jpg';
-import { useSendOfferMutation } from './api/apiSlice';
+import { useSendOfferMutation, useGetOffersQuery } from './api/apiSlice';
 
 const Offer = () => {
   //destructuring the useSendOfferMutation hook
   const [sendOffer, { data, isLoading, isSuccess, isError, error }] =
     useSendOfferMutation();
+  //destructuring the useGetOffersQuery hook and renaming for this query
+  const {
+    refetch: refetchOffers,
+    data: offers,
+    isLoading: isLoadingOffers,
+    isError: isErrorOffers,
+    isSuccess: isSuccessOffers,
+  } = useGetOffersQuery();
+  //useState hook to store the offer
   const [offer, setOffer] = useState('');
 
+  //Handles the Avg Offer
+  let avgOffer;
+  if (isLoadingOffers) {
+    avgOffer = (
+      <p className='text-center text-3xl text-slate-100 p-2'>Loading...</p>
+    );
+  } else if (isSuccessOffers) {
+    avgOffer = (
+      <p className='text-center text-3xl text-slate-100 p-2'>
+        Avg Offer :{' '}
+        {Math.floor(
+          offers.reduce((acc, curr) => acc + curr, 0) / offers.length
+        )}
+      </p>
+    );
+  } else if (isErrorOffers) {
+    avgOffer = (
+      <p className='text-center text-3xl text-slate-100 p-2'>Error: {error}</p>
+    );
+  }
+
+  //Handles Ibens Responses
   let ibensResponse;
   if (isLoading) {
     //loading we want to display something. Could add a spinner here.
@@ -48,12 +79,15 @@ const Offer = () => {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     //send the offer to the server checking for an integer and removing any commas.
     //if no int we still send just to show off the error message.
-    sendOffer(parseInt(offer.replaceAll(',', '')) || offer);
+    await sendOffer(
+      parseInt(offer.replaceAll(',', '').replaceAll('$', '')) || offer
+    );
     setOffer('');
+    refetchOffers();
   };
 
   return (
@@ -69,7 +103,7 @@ const Offer = () => {
             alt=''
             className='w-auto h-60 mx-auto m-5 rounded-full'
           />
-          <div className='text-center text-xl pt-0 font-bold font-sans  text-slate-100'>
+          <div className='text-center text-xl p-2 font-bold font-sans  text-slate-100'>
             {ibensResponse || 'So what can you offer me?'}
           </div>
         </div>
@@ -86,7 +120,7 @@ const Offer = () => {
             <form onSubmit={handleSubmit}>
               {/* Could add form validation here to make sure the input is a number before sending it to the server, but again wanted to try error handling with Redux Toolkit */}
               <input
-                class='shadow appearance-none border rounded w-[25%] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                className='shadow appearance-none border rounded w-[25%] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
                 type='text'
                 value={offer}
                 onChange={(e) => setOffer(e.target.value)}
@@ -103,6 +137,8 @@ const Offer = () => {
           </div>
         </div>
       </div>
+      {avgOffer}
+      <p className='text-center text-sm text-gray-600 italic'>All for fun!</p>
     </div>
   );
 };
